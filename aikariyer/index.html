@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>AIKariyer – Çok Yakında</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .box {
+      max-width: 480px;
+      text-align: center;
+      padding: 32px;
+    }
+    h1 { font-size: 32px; margin-bottom: 12px; }
+    p { opacity: 0.9; }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-top: 16px;
+      border-radius: 8px;
+      border: none;
+    }
+    button {
+      margin-top: 12px;
+      padding: 12px;
+      width: 100%;
+      border-radius: 8px;
+      border: none;
+      background: #38bdf8;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="box">
+  <h1>Kariyer Asistanın Çok Yakında</h1>
+  <p>
+    Yapay zekâ destekli kariyer asistanımız yayına hazırlanıyor.
+    İlk haberdar olmak ister misin?
+  </p>
+
+  <form method="POST" action="/api/subscribe">
+    <input type="email" name="email" placeholder="E-posta adresin" required />
+    <button type="submit">Haberdar Et</button>
+  </form>
+
+  <p style="font-size:12px;opacity:.6;margin-top:12px">
+    Spam yok. Sadece yayına açıldığında haber.
+  </p>
+</div>
+
+</body>
+</html>
