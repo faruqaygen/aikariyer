@@ -9,7 +9,7 @@ export async function onRequestPost({ request, env }) {
     const normalizedEmail = email.toLowerCase();
 
     // ✅ Supabase REST insert (DOĞRU ŞEKİL)
-    const insert = await fetch(`${env.SUPABASE_URL}/rest/v1/subscribers`, {
+    const insert = await fetch(`${env.SUPABASE_URL}/rest/v1/waitlist`, {
       method: "POST",
       headers: {
         "apikey": env.SUPABASE_SERVICE_ROLE_KEY,
