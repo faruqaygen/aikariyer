@@ -23,6 +23,11 @@ export async function onRequestPost({ request, env }) {
     })
   });
 
+  if (res.status === 409) {
+    // duplicate
+    return new Response("duplicate", { status: 409 });
+  }
+
   if (!res.ok) return new Response("Supabase hatası", { status: 500 });
 
   return new Response(JSON.stringify({ ok: true }), {
