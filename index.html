@@ -19,6 +19,7 @@
       max-width: 480px;
       text-align: center;
       padding: 32px;
+      position: relative;
     }
     h1 { font-size: 32px; margin-bottom: 12px; }
     p { opacity: 0.9; }
@@ -43,11 +44,37 @@
       margin-left: auto;
       margin-right: auto;
     }
-    .message {
+    .privacy {
+      font-size: 12px;
+      opacity: 0.6;
       margin-top: 16px;
-      font-size: 16px;
-      opacity: 0.9;
     }
+    .privacy a { color: #38bdf8; text-decoration: none; cursor:pointer; }
+
+    /* POPUP STYLING */
+    .popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: #1e293b;
+      color: #e5e7eb;
+      padding: 24px 32px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      text-align: center;
+      z-index: 9999;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      opacity: 0;
+      max-width: 90%;
+      max-height: 80%;
+      overflow-y: auto;
+    }
+    .popup.show { transform: translate(-50%, -50%) scale(1); opacity:1; }
+    .popup p { margin:0; font-size:16px; line-height:1.5; }
+    .popup button { margin-top: 12px; width: 100px; background:#38bdf8; border-radius:8px; border:none; cursor:pointer; font-weight:600; }
+    .popup h2 { margin-top: 16px; margin-bottom:8px; font-size:20px; }
+    .popup ul { text-align:left; padding-left:20px; margin-bottom:8px; }
   </style>
 </head>
 <body>
@@ -64,16 +91,76 @@
     <button type="submit">Haberdar Et</button>
   </form>
 
-  <p style="font-size:12px;opacity:.6;margin-top:12px">
-    Spam yok. Sadece yayına açıldığında haber.
+  <p class="privacy">
+    Gizlilik Politikası: <span id="privacy-link">Detaylı Bilgi</span>
   </p>
+</div>
 
-  <div class="message" id="message"></div>
+<!-- MAIL POPUP MODAL -->
+<div id="popup" class="popup">
+  <p id="popup-message"></p>
+  <button onclick="closePopup()">Tamam</button>
+</div>
+
+<!-- PRIVACY MODAL -->
+<div id="privacy-popup" class="popup">
+  <h1>Gizlilik Politikası ve KVKK</h1>
+  <p>AIKariyer olarak kullanıcılarımızın kişisel verilerini korumak temel önceliğimizdir. Bu sayfada, KVKK kapsamında kişisel verilerinizin işlenme şekli ve haklarınız hakkında bilgi verilmektedir.</p>
+
+  <h2>1. Veri Sorumlusu</h2>
+  <p>AIKariyer – info@aikariyer.com</p>
+
+  <h2>2. Toplanan Kişisel Veriler</h2>
+  <ul>
+    <li>E-posta adresi</li>
+    <li>Verinin kaynağı (coming soon formu)</li>
+    <li>Verinin oluşturulma tarihi</li>
+  </ul>
+
+  <h2>3. İşlenme Amacı</h2>
+  <p>Toplanan veriler yalnızca kullanıcıları AIKariyer yayına açıldığında bilgilendirmek amacıyla kullanılır.</p>
+
+  <h2>4. Aktarım</h2>
+  <p>Veriler üçüncü kişilerle paylaşılmaz ve yalnızca Supabase altyapısında güvenli şekilde saklanır.</p>
+
+  <h2>5. Haklarınız</h2>
+  <ul>
+    <li>Kişisel verilerinize erişim</li>
+    <li>Düzeltme talebi</li>
+    <li>Silme talebi</li>
+    <li>İşlenmeye itiraz</li>
+    <li>Veri aktarımı talebi</li>
+  </ul>
+  <p>Haklarınızı kullanmak için <a href="mailto:info@aikariyer.com">info@aikariyer.com</a> üzerinden iletişime geçebilirsiniz.</p>
+
+  <h2>6. Veri Güvenliği</h2>
+  <p>Toplanan veriler şifreli ve güvenli şekilde saklanır. AIKariyer gerekli tüm teknik ve idari tedbirleri alır.</p>
+
+  <h2>7. Güncellemeler</h2>
+  <p>Politika güncellemeleri bu modal üzerinden duyurulacaktır.</p>
+
+  <button onclick="closePrivacy()">Kapat</button>
 </div>
 
 <script>
   const form = document.getElementById("subscribe-form");
-  const messageDiv = document.getElementById("message");
+  const popup = document.getElementById("popup");
+  const popupMessage = document.getElementById("popup-message");
+
+  const privacyLink = document.getElementById("privacy-link");
+  const privacyPopup = document.getElementById("privacy-popup");
+
+  function showPopup(msg) {
+    popupMessage.textContent = msg;
+    popup.classList.add("show");
+  }
+
+  function closePopup() { popup.classList.remove("show"); }
+
+  function showPrivacy() { privacyPopup.classList.add("show"); }
+  function closePrivacy() { privacyPopup.classList.remove("show"); }
+
+  privacyLink.addEventListener("click", showPrivacy);
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -87,18 +174,18 @@
       });
 
       if (res.ok) {
-        messageDiv.innerHTML = "🎉 Teşekkürler! Çok yakında buradayız.";
+        showPopup("🎉 Teşekkürler! Çok yakında buradayız.");
         form.reset();
       } else {
         const err = await res.text();
-        if (err.includes("duplicate")) {
-          messageDiv.innerHTML = "😎 Heyecanınızı anlıyoruz, mail adresiniz zaten kayıtlı!";
+        if (err.includes("duplicate") || res.status === 409) {
+          showPopup("😎 Heyecanınızı anlıyoruz, mail adresiniz zaten kayıtlı!");
         } else {
-          messageDiv.innerHTML = "⚠️ Bir hata oluştu, tekrar deneyin.";
+          showPopup("⚠️ Bir hata oluştu, tekrar deneyin.");
         }
       }
     } catch (err) {
-      messageDiv.innerHTML = "⚠️ İletişim hatası: " + err.message;
+      showPopup("⚠️ İletişim hatası: " + err.message);
     }
   });
 </script>
