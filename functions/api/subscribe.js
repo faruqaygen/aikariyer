@@ -1,32 +1,47 @@
 export async function onRequestPost({ request, env }) {
   try {
     const { email } = await request.json();
-
     if (!email) {
       return new Response("Email gerekli", { status: 400 });
     }
 
     const normalizedEmail = email.toLowerCase();
 
-    // ✅ Supabase REST insert (DOĞRU ŞEKİL)
+    /* 1️⃣ VAR MI KONTROLÜ */
+    const check = await fetch(
+      `${env.SUPABASE_URL}/rest/v1/waitlist?email=eq.${normalizedEmail}&select=id`,
+      {
+        headers: {
+          "apikey": env.SUPABASE_SERVICE_ROLE_KEY,
+          "Authorization": `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`
+        }
+      }
+    );
+
+    const existing = await check.json();
+    const isDuplicate = existing.length > 0;
+
+    /* 2️⃣ VARSA → DUR */
+    if (isDuplicate) {
+      return new Response("DUPLICATE", { status: 200 });
+    }
+
+    /* 3️⃣ YOKSA → INSERT */
     const insert = await fetch(`${env.SUPABASE_URL}/rest/v1/waitlist`, {
       method: "POST",
       headers: {
         "apikey": env.SUPABASE_SERVICE_ROLE_KEY,
         "Authorization": `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
-        "Content-Type": "application/json",
-        "Prefer": "resolution=ignore-duplicates"
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({ email: normalizedEmail })
     });
 
-    const isDuplicate = insert.status === 409;
-    
-    if (!insert.ok && !isDuplicate) {
+    if (!insert.ok) {
       return new Response("Supabase hatası", { status: 500 });
     }
 
-    // 📧 Her durumda bilgilendirme maili
+    /* 4️⃣ SADECE YENİ KAYITTA MAIL */
     await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -40,30 +55,16 @@ export async function onRequestPost({ request, env }) {
         html: `
           <div style="font-family:Arial,sans-serif;line-height:1.6">
             <h2>Merhaba 👋</h2>
-            <p>
-              <strong>AIKariyer</strong> için ${
-                isDuplicate
-                  ? "daha önce kayıt oluşturmuştunuz"
-                  : "kay­dınız başarıyla alındı"
-              }.
-            </p>
-            <p>
-              Platformumuz yayına girdiğinde sizi ilk haberdar edeceğiz 🚀
-            </p>
+            <p><strong>AIKariyer</strong> için kaydınız başarıyla alındı.</p>
+            <p>Platform yayına girdiğinde sizi ilk haberdar edeceğiz 🚀</p>
             <p style="margin-top:24px">
-              İlginiz için teşekkür ederiz.<br/>
+              Teşekkürler,<br/>
               <strong>AIKariyer Ekibi</strong>
             </p>
-            <hr/>
-            <small>Bu e-posta otomatik gönderilmiştir. Yanıtlamayınız.</small>
           </div>
         `
       })
     });
-
-    if (isDuplicate) {
-      return new Response("DUPLICATE", { status: 200 });
-    }
 
     return new Response("OK", { status: 200 });
 
