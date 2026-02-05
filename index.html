@@ -61,6 +61,34 @@
   </p>
 </div>
 
+  <script>
+  const form = document.getElementById("subscribe-form");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const email = form.email.value;
+
+    const res = await fetch("/api/subscribe", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email })
+    });
+
+    if (res.ok) {
+      form.innerHTML = "<p>🎉 Teşekkürler! Çok yakında buradayız.</p>";
+    } else {
+      alert("Bir hata oluştu, tekrar dene.");
+    }
+  });
+</script>
+
+  
 </body>
 </html>
+
+
+
+
+
 
