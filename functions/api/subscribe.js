@@ -1,10 +1,13 @@
 export async function onRequestPost({ request, env }) {
-  const formData = await request.formData();
-  const email = formData.get("email");
-
-  if (!email) {
-    return new Response("Email gerekli", { status: 400 });
+  let data;
+  try {
+    data = await request.json();
+  } catch {
+    return new Response("JSON hatası", { status: 400 });
   }
+
+  const email = data.email;
+  if (!email) return new Response("Email gerekli", { status: 400 });
 
   const res = await fetch(`${env.SUPABASE_URL}/rest/v1/waitlist`, {
     method: "POST",
@@ -20,16 +23,9 @@ export async function onRequestPost({ request, env }) {
     })
   });
 
-  if (!res.ok) {
-    return new Response("Bir hata oluştu", { status: 500 });
-  }
+  if (!res.ok) return new Response("Supabase hatası", { status: 500 });
 
-  return new Response(`
-    <html>
-      <body style="font-family:system-ui;text-align:center;padding:40px">
-        <h2>Teşekkürler 🎉</h2>
-        <p>AIKariyer yayına açıldığında seni bilgilendireceğiz.</p>
-      </body>
-    </html>
-  `, { headers: { "Content-Type": "text/html" }});
+  return new Response(JSON.stringify({ ok: true }), {
+    headers: { "Content-Type": "application/json" }
+  });
 }
