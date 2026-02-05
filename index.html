@@ -51,7 +51,7 @@
     İlk sen haberdar olmak ister misin?
   </p>
 
-  <form method="POST" action="/api/subscribe">
+  <form id="subscribe-form">
     <input type="email" name="email" placeholder="E-posta adresin" required />
     <button type="submit">Haberdar Et</button>
   </form>
@@ -61,34 +61,31 @@
   </p>
 </div>
 
-  <script>
+<script>
   const form = document.getElementById("subscribe-form");
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-
     const email = form.email.value;
 
-    const res = await fetch("/api/subscribe", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email })
-    });
+    try {
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
+      });
 
-    if (res.ok) {
-      form.innerHTML = "<p>🎉 Teşekkürler! Çok yakında buradayız.</p>";
-    } else {
-      alert("Bir hata oluştu, tekrar dene.");
+      if (res.ok) {
+        form.innerHTML = "<p>🎉 Teşekkürler! Çok yakında buradayız.</p>";
+      } else {
+        const err = await res.text();
+        alert("Hata: " + err);
+      }
+    } catch (err) {
+      alert("İletişim hatası: " + err.message);
     }
   });
 </script>
 
-  
 </body>
 </html>
-
-
-
-
-
-
