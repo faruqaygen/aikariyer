@@ -1,36 +1,32 @@
 export async function onRequestPost({ request, env }) {
   try {
-    let data;
-    try {
-      data = await request.json();
-    } catch {
-      return new Response("JSON hatası", { status: 400 });
-    }
+    const { email } = await request.json();
 
-    const email = data.email?.toLowerCase();
     if (!email) {
       return new Response("Email gerekli", { status: 400 });
     }
 
-    // 1️⃣ Supabase insert
-    const res = await fetch(`${env.SUPABASE_URL}/rest/v1/subscribers`, {
+    const normalizedEmail = email.toLowerCase();
+
+    // ✅ Supabase REST insert (DOĞRU ŞEKİL)
+    const insert = await fetch(`${env.SUPABASE_URL}/rest/v1/subscribers`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
         "apikey": env.SUPABASE_SERVICE_ROLE_KEY,
         "Authorization": `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+        "Content-Type": "application/json",
         "Prefer": "resolution=ignore-duplicates"
       },
-      body: JSON.stringify({ email })
+      body: JSON.stringify({ email: normalizedEmail })
     });
 
-    const isDuplicate = res.status === 409;
+    const isDuplicate = insert.status === 409;
 
-    if (!res.ok && !isDuplicate) {
+    if (!insert.ok && !isDuplicate) {
       return new Response("Supabase hatası", { status: 500 });
     }
 
-    // 2️⃣ Her durumda bilgilendirme maili
+    // 📧 Her durumda bilgilendirme maili
     await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -39,7 +35,7 @@ export async function onRequestPost({ request, env }) {
       },
       body: JSON.stringify({
         from: "AIKariyer <noreply@aikariyer.com>",
-        to: [email],
+        to: [normalizedEmail],
         subject: "🎉 AIKariyer – Kaydınız Alındı",
         html: `
           <div style="font-family:Arial,sans-serif;line-height:1.6">
@@ -52,8 +48,7 @@ export async function onRequestPost({ request, env }) {
               }.
             </p>
             <p>
-              Yapay zekâ destekli kariyer asistanımız yayına girdiğinde
-              sizi ilk haberdar edeceğiz 🚀
+              Platformumuz yayına girdiğinde sizi ilk haberdar edeceğiz 🚀
             </p>
             <p style="margin-top:24px">
               İlginiz için teşekkür ederiz.<br/>
@@ -66,7 +61,6 @@ export async function onRequestPost({ request, env }) {
       })
     });
 
-    // 3️⃣ Frontend cevabı
     if (isDuplicate) {
       return new Response("DUPLICATE", { status: 200 });
     }
