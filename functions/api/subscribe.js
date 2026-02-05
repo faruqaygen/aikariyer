@@ -20,22 +20,15 @@ export async function onRequestPost({ request, env }) {
       body: JSON.stringify({ email: normalizedEmail })
     });
 
-  if (res.status === 409) {
+    //const isDuplicate = insert.status === 409;
+ if (res.status === 409) {
     // duplicate
     return new Response("duplicate", { status: 409 });
   }
-
-  if (!res.ok) return new Response("Supabase hatası", { status: 500 });
-
-  return new Response(JSON.stringify({ ok: true }), {
-    headers: { "Content-Type": "application/json" }
-  });
     
-    /*const isDuplicate = insert.status === 409;
-
-    if (!insert.ok && !isDuplicate) {
+    if (!insert.ok/* && !isDuplicate*/) {
       return new Response("Supabase hatası", { status: 500 });
-    }*/
+    }
 
     // 📧 Her durumda bilgilendirme maili
     await fetch("https://api.resend.com/emails", {
