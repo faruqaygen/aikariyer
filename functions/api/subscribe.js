@@ -24,7 +24,6 @@ export async function onRequestPost({ request, env }) {
   });
 
   if (res.status === 409) {
-    // duplicate
     return new Response("duplicate", { status: 409 });
   }
 
