@@ -20,13 +20,9 @@ export async function onRequestPost({ request, env }) {
       body: JSON.stringify({ email: normalizedEmail })
     });
 
-    //const isDuplicate = insert.status === 409;
- if (res.status === 409) {
-    // duplicate
-    return new Response("duplicate", { status: 409 });
-  }
+    const isDuplicate = insert.status === 409;
     
-    if (!insert.ok/* && !isDuplicate*/) {
+    if (!insert.ok && !isDuplicate) {
       return new Response("Supabase hatası", { status: 500 });
     }
 
