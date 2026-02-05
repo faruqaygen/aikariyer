@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>AIKariyer – Çok Yakında</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
     body {
       font-family: system-ui, sans-serif;
@@ -15,14 +16,16 @@
       height: 100vh;
       margin: 0;
     }
+
     .box {
       max-width: 480px;
       text-align: center;
       padding: 32px;
-      position: relative;
     }
+
     h1 { font-size: 32px; margin-bottom: 12px; }
     p { opacity: 0.9; }
+
     input {
       width: 100%;
       padding: 12px;
@@ -31,6 +34,7 @@
       border: none;
       text-align: center;
     }
+
     button {
       margin-top: 12px;
       padding: 12px 0;
@@ -44,45 +48,52 @@
       margin-left: auto;
       margin-right: auto;
     }
+
     .privacy {
       font-size: 12px;
       opacity: 0.6;
       margin-top: 16px;
     }
-    .privacy a { color: #38bdf8; text-decoration: none; cursor:pointer; }
 
-    /* POPUP STYLING */
+    .privacy span {
+      color: #38bdf8;
+      cursor: pointer;
+    }
+
+    /* POPUP */
     .popup {
       position: fixed;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%) scale(0);
+      transform: translate(-50%, -50%) scale(0.9);
       background: #1e293b;
-      color: #e5e7eb;
       padding: 24px 32px;
       border-radius: 12px;
       box-shadow: 0 0 20px rgba(0,0,0,0.5);
       text-align: center;
       z-index: 9999;
-      transition: transform 0.3s ease, opacity 0.3s ease;
       opacity: 0;
+      transition: all 0.25s ease;
       max-width: 90%;
-      max-height: 80%;
-      overflow-y: auto;
     }
-    .popup.show { transform: translate(-50%, -50%) scale(1); opacity:1; }
-    .popup p { margin:0; font-size:16px; line-height:1.5; }
-    .popup button { margin-top: 12px; width: 100px; background:#38bdf8; border-radius:8px; border:none; cursor:pointer; font-weight:600; }
-    .popup h2 { margin-top: 16px; margin-bottom:8px; font-size:20px; }
-    .popup ul { text-align:left; padding-left:20px; margin-bottom:8px; }
+
+    .popup.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .popup button {
+      margin-top: 16px;
+      width: 120px;
+    }
   </style>
 </head>
 <body>
 
 <div class="box">
-  <h1>Kariyer Asistanın Çok Yakında Yayında</h1>
+  <h1>Kariyer Asistanın Çok Yakında</h1>
   <p>
-    Yapay zekâ destekli kariyer asistanımız yayına hazırlanıyor.
+    Yapay zekâ destekli kariyer asistanımız yayına hazırlanıyor.<br/>
     İlk sen haberdar olmak ister misin?
   </p>
 
@@ -96,49 +107,19 @@
   </p>
 </div>
 
-<!-- MAIL POPUP MODAL -->
+<!-- POPUP -->
 <div id="popup" class="popup">
   <p id="popup-message"></p>
   <button onclick="closePopup()">Tamam</button>
 </div>
 
-<!-- PRIVACY MODAL -->
+<!-- PRIVACY -->
 <div id="privacy-popup" class="popup">
-  <h1>Gizlilik Politikası ve KVKK</h1>
-  <p>AIKariyer olarak kullanıcılarımızın kişisel verilerini korumak temel önceliğimizdir. Bu sayfada, KVKK kapsamında kişisel verilerinizin işlenme şekli ve haklarınız hakkında bilgi verilmektedir.</p>
-
-  <h2>1. Veri Sorumlusu</h2>
-  <p>AIKariyer – info@aikariyer.com</p>
-
-  <h2>2. Toplanan Kişisel Veriler</h2>
-  <ul>
-    <li>E-posta adresi</li>
-    <li>Verinin kaynağı (coming soon formu)</li>
-    <li>Verinin oluşturulma tarihi</li>
-  </ul>
-
-  <h2>3. İşlenme Amacı</h2>
-  <p>Toplanan veriler yalnızca kullanıcıları AIKariyer yayına açıldığında bilgilendirmek amacıyla kullanılır.</p>
-
-  <h2>4. Aktarım</h2>
-  <p>Veriler üçüncü kişilerle paylaşılmaz ve yalnızca Supabase altyapısında güvenli şekilde saklanır.</p>
-
-  <h2>5. Haklarınız</h2>
-  <ul>
-    <li>Kişisel verilerinize erişim</li>
-    <li>Düzeltme talebi</li>
-    <li>Silme talebi</li>
-    <li>İşlenmeye itiraz</li>
-    <li>Veri aktarımı talebi</li>
-  </ul>
-  <p>Haklarınızı kullanmak için <a href="mailto:info@aikariyer.com">info@aikariyer.com</a> üzerinden iletişime geçebilirsiniz.</p>
-
-  <h2>6. Veri Güvenliği</h2>
-  <p>Toplanan veriler şifreli ve güvenli şekilde saklanır. AIKariyer gerekli tüm teknik ve idari tedbirleri alır.</p>
-
-  <h2>7. Güncellemeler</h2>
-  <p>Politika güncellemeleri bu modal üzerinden duyurulacaktır.</p>
-
+  <h2>Gizlilik & KVKK</h2>
+  <p>
+    E-posta adresiniz yalnızca AIKariyer yayına alındığında
+    bilgilendirme yapmak amacıyla saklanır.
+  </p>
   <button onclick="closePrivacy()">Kapat</button>
 </div>
 
@@ -146,25 +127,30 @@
   const form = document.getElementById("subscribe-form");
   const popup = document.getElementById("popup");
   const popupMessage = document.getElementById("popup-message");
-
-  const privacyLink = document.getElementById("privacy-link");
   const privacyPopup = document.getElementById("privacy-popup");
 
-  function showPopup(msg) {
-    popupMessage.textContent = msg;
+  function showPopup(message) {
+    popupMessage.textContent = message;
     popup.classList.add("show");
   }
 
-  function closePopup() { popup.classList.remove("show"); }
+  function closePopup() {
+    popup.classList.remove("show");
+  }
 
-  function showPrivacy() { privacyPopup.classList.add("show"); }
-  function closePrivacy() { privacyPopup.classList.remove("show"); }
+  function closePrivacy() {
+    privacyPopup.classList.remove("show");
+  }
 
-  privacyLink.addEventListener("click", showPrivacy);
+  document
+    .getElementById("privacy-link")
+    .addEventListener("click", () => privacyPopup.classList.add("show"));
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const email = form.email.value;
+
+    const email = form.email.value.trim();
+    if (!email) return;
 
     try {
       const res = await fetch("/api/subscribe", {
@@ -173,19 +159,23 @@
         body: JSON.stringify({ email })
       });
 
-      if (res.ok) {
-        showPopup("🎉 Teşekkürler! Çok yakında buradayız.");
+      const text = await res.text();
+
+      if (res.ok && text === "OK") {
+        showPopup("🎉 Teşekkürler! Yayına girdiğimizde haber vereceğiz.");
         form.reset();
-      } else {
-        const err = await res.text();
-        if (err.includes("duplicate") || res.status === 409) {
-          showPopup("😎 Heyecanınızı anlıyoruz, mail adresiniz zaten kayıtlı!");
-        } else {
-          showPopup("⚠️ Bir hata oluştu, tekrar deneyin.");
-        }
+        return;
       }
+
+      if (res.ok && text === "DUPLICATE") {
+        showPopup("😎 Bu e-posta adresi zaten kayıtlı.");
+        return;
+      }
+
+      showPopup("⚠️ Bir hata oluştu, lütfen tekrar deneyin.");
+
     } catch (err) {
-      showPopup("⚠️ İletişim hatası: " + err.message);
+      showPopup("⚠️ Sunucuya ulaşılamadı.");
     }
   });
 </script>
